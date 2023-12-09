@@ -17,7 +17,8 @@ const SongsList: FC<SongsListProps> = ({ songs, selectSongIds, onToggleSelectSon
                     className={clsx(
                         "p-2 text-2xl border border-gray-400 text-purple-700",
                         selectSongIds.includes(song.id) && "bg-purple-300 text-purple-200",
-                        "disabled:bg-gray-200 disabled:text-gray-200"
+                        "disabled:bg-gray-200 disabled:text-gray-200",
+                        "transition-all duration-300"
                     )}
                     onClick={() => onToggleSelectSong(song.id)}
                     disabled={isLoading}
