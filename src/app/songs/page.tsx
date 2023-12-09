@@ -1,7 +1,12 @@
 
 import { getAllSongs } from "@/songs/getAll"
+import { Metadata } from "next"
 import { FC } from "react"
 import Songs from "./Songs"
+
+export const metadata: Metadata = {
+    title: "BINGO"
+}
 
 interface RandomSongPageProps {
 }

@@ -3,13 +3,13 @@
 import Button from "@/components/Button"
 import Dialog, { DialogProps, useDialog } from "@/components/Dialog"
 import { Song } from "@/songs/type"
-import { sleep } from "@/util/sleep"
 import { useLocalStorage } from "@/util/useLocalStorage"
-import clsx from "clsx"
 import { motion } from "framer-motion"
+import Link from "next/link"
 import { FC, useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import YouTube from "react-youtube"
+import SongsList from "./SongsList"
 
 interface SongsProps {
     songs: Song[]
@@ -39,23 +39,50 @@ const Songs: FC<SongsProps> = ({ songs }) => {
                 {selectSongIds.length}/{songs.length}
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                {songs.map(song =>
-                    <button
-                        key={song.id}
-                        className={clsx(
-                            "p-2 text-2xl border border-gray-400",
-                            selectSongIds.includes(song.id) && "bg-purple-300",
-                            "disabled:bg-gray-200 disabled:text-gray-200"
-                        )}
-                        onClick={() => handleToggleSelectSong(song.id)}
-                        disabled={isLoading}
-                    >
-                        {selectSongIds.includes(song.id) && "✅ "}
-                        {song.title}
-                    </button>
-                )}
-            </div>
+            <SongsList
+                songs={songs}
+                selectSongIds={selectSongIds}
+                isLoading={isLoading}
+                onToggleSelectSong={handleToggleSelectSong}
+            />
+
+            <hr className="my-24" />
+
+            <h2 className="text-xl font-bold">
+                抽選済みの楽曲
+                {" "}
+                ({selectSongIds.length} / {songs.length})
+            </h2>
+
+            {selectSongIds.map(id => {
+                const song = songs.find(s => s.id === id)
+                if (!song) return <>...</>
+                return (
+                    <div key={song.id} className="px-2 my-4">
+                        <Link href={`https://youtu.be/${song.id}`} className="text-xl text-blue-600 underline visited:text-purple-800" target="_blank">
+                            {song.title}
+                        </Link>
+                    </div>
+                )
+            })}
+
+            <hr className="my-24" />
+
+            <h2 className="text-xl font-bold">
+                未抽選の楽曲
+                {" "}
+                ({songs.length - selectSongIds.length} / {songs.length})
+            </h2>
+
+            {songs
+                .filter(s => !selectSongIds.includes(s.id))
+                .map(song => (
+                    <div key={song.id} className="px-2 my-4">
+                        <Link href={`https://youtu.be/${song.id}`} className="text-xl text-blue-600 underline visited:text-purple-800">
+                            {song.title}
+                        </Link>
+                    </div>
+                ))}
 
             <div className="fixed right-2 bottom-2 flex gap-2">
                 <Button onClick={handleOpenDialog}>
@@ -106,11 +133,11 @@ const RandomSelectDialog: FC<RandomSelectDialogProps> = ({ onClose, songs, selec
             const noneSelectedSongs = songs.filter(song => !selectedSongIds.includes(song.id))
             const randomSong = noneSelectedSongs[Math.floor(Math.random() * noneSelectedSongs.length)]
             if (!randomSong) return
-            await sleep(1200)
-            setCount(2)
-            await sleep(1200)
-            setCount(1)
-            await sleep(1200)
+            // await sleep(1200)
+            // setCount(2)
+            // await sleep(1200)
+            // setCount(1)
+            // await sleep(1200)
             setCount(0)
             setResult(randomSong)
         }
@@ -131,7 +158,9 @@ const RandomSelectDialog: FC<RandomSelectDialogProps> = ({ onClose, songs, selec
                                     }}
                                     transition={{ delay: 3.5, duration: 1.0 }}
                                 >
-                                    {result.title}
+                                    <Link href={`https://youtu.be/${result.id}`} className="hover:underline" target="_blank">
+                                        {result.title}
+                                    </Link>
                                 </motion.div>
                                 <motion.div
                                     animate={{
@@ -149,6 +178,7 @@ const RandomSelectDialog: FC<RandomSelectDialogProps> = ({ onClose, songs, selec
                                                 autoplay: 1,
                                                 controls: 0,
                                                 start: result.chorusTime,
+                                                loop: 1,
                                             },
                                         }}
                                     />
